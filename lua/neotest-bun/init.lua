@@ -183,7 +183,7 @@ Adapter = {
 	---@return table<string, neotest.Result>
 	results = function(spec, _result, tree)
 		local xml_content = readXMLFile("./neotest-bun.xml")
-		-- os.remove("./neotest-bun.xml")
+		os.remove("./neotest-bun.xml")
 		local results = parser.xmlToNeotestResults(xml_content)
 
 		local formatted_results = {}
