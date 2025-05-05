@@ -33,6 +33,9 @@ Make sure you have the appropriate `treesitter` language parsers installed other
 
 ## Usage
 
+![Screen Recording May 5 2025 (1)](https://github.com/user-attachments/assets/ac11c56c-ebfa-4dc5-88d3-1f6f94175180)
+
+
 See neotest's documentation for more information on how to run tests. Just make sure you have bun installed and in your path.
 
 ## Configuration
