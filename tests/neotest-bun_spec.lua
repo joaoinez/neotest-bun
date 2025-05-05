@@ -139,5 +139,30 @@ describe("neotest-bun", function()
 				inspect(result)
 			)
 		end)
+
+		async.it("works on example taken from a real project", function()
+			local str = "inner &amp;gt; middle &amp;gt; outer"
+			local splitted_str = str:split(" &amp;gt; ")
+			assert.Equal(splitted_str[1], "inner")
+			assert.Equal(splitted_str[2], "middle")
+			assert.Equal(splitted_str[3], "outer")
+
+			local xml = [[
+<testsuites name="bun test" tests="1" assertions="2" failures="0" skipped="0" time="0.959527">
+  <testsuite name="src/app/features/db.test.ts" tests="1" assertions="2" failures="0" skipped="0" time="0.006" hostname="Bences-MacBook-Pro.local">
+    <testcase name="handles the test db properly, resets it between test runs, and allows interaction" classname="postgres" time="0.006859" file="src/app/features/db.test.ts" assertions="2" />
+  </testsuite>
+</testsuites>
+			]]
+			local result = require("neotest-bun.parse-result").xmlToNeotestResults(xml)
+			assert.Equal(
+				inspect({
+					["src/app/features/db.test.ts::postgres::handles the test db properly, resets it between test runs, and allows interaction"] = {
+						status = "passed",
+					},
+				}),
+				inspect(result)
+			)
+		end)
 	end)
 end)

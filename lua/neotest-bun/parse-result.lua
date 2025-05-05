@@ -80,9 +80,10 @@ local function xmlToNeotestResults(xml_string)
 		local suites = #testsuite.testsuite == 0 and { testsuite.testsuite } or testsuite.testsuite
 		for _, suite in ipairs(suites) do
 			local file_path = suite._attr.name
+			local testcases = #suite.testcase == 0 and { suite.testcase } or suite.testcase
 
 			-- Process test cases
-			for _, testcase in ipairs(suite.testcase) do
+			for _, testcase in ipairs(testcases) do
 				local test_name = testcase._attr.name
 				local classname = testcase._attr.classname
 
