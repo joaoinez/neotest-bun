@@ -50,8 +50,14 @@ function string:split(delimiter)
 end
 
 function ReverseAndJoin(str)
-	-- Split the string by " &;gt; "
-	local parts = str:split(" &gt; ")
+	-- Handle both " &gt; " and " > " patterns
+	local parts
+	if string.find(str, " &gt; ") then
+		parts = str:split(" &gt; ")
+	else
+		parts = str:split(" > ")
+	end
+	
 	-- Reverse the array
 	local reversed = {}
 	for i = #parts, 1, -1 do

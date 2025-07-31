@@ -224,5 +224,35 @@ describe("neotest-bun", function()
 				inspect(result)
 			)
 		end)
+
+		async.it("handles all passed tests in nested structure", function()
+			local xml = [[
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="bun test" tests="3" assertions="28" failures="0" skipped="0" time="3.341727">
+  <testsuite name="src/app/modules/payment/services/payment/cash-sync-2.test.ts" file="src/app/modules/payment/services/payment/cash-sync-2.test.ts" tests="3" assertions="28" failures="0" skipped="0" time="0" hostname="Bences-MacBook-Pro.local">
+    <testsuite name="sync" file="src/app/modules/payment/services/payment/cash-sync-2.test.ts" line="11" tests="3" assertions="28" failures="0" skipped="0" time="1.065" hostname="Bences-MacBook-Pro.local">
+      <testcase name="logged out payment" classname="sync" time="0.502228" file="src/app/modules/payment/services/payment/cash-sync-2.test.ts" line="12" assertions="9" />
+      <testcase name="logged in payment" classname="sync" time="0.314535" file="src/app/modules/payment/services/payment/cash-sync-2.test.ts" line="81" assertions="13" />
+      <testcase name="topup" classname="sync" time="0.249293" file="src/app/modules/payment/services/payment/cash-sync-2.test.ts" line="139" assertions="6" />
+    </testsuite>
+  </testsuite>
+</testsuites>
+			]]
+			local result = require("neotest-bun.parse-result").xmlToNeotestResults(xml)
+			assert.Equal(
+				inspect({
+					["sync::sync::logged out payment"] = {
+						status = "passed",
+					},
+					["sync::sync::logged in payment"] = {
+						status = "passed",
+					},
+					["sync::sync::topup"] = {
+						status = "passed",
+					},
+				}),
+				inspect(result)
+			)
+		end)
 	end)
 end)
