@@ -164,5 +164,65 @@ describe("neotest-bun", function()
 				inspect(result)
 			)
 		end)
+
+		async.it("works on other example taken from a real project", function()
+			local str = "inner &amp;gt; middle &amp;gt; outer"
+			local splitted_str = str:split(" &amp;gt; ")
+			assert.Equal(splitted_str[1], "inner")
+			assert.Equal(splitted_str[2], "middle")
+			assert.Equal(splitted_str[3], "outer")
+
+			local xml = [[
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="bun test" tests="22" assertions="1" failures="0" skipped="21" time="0.843802">
+  <testsuite name="src/app/modules/coupon/services/coupon/coupon-service-2.test.ts" tests="22" assertions="1" failures="0" skipped="21" time="0.016" hostname="Bences-MacBook-Pro.local">
+    <testcase name="accepts coupon within valid date range" classname="Date validity &amp;gt; Validating coupon" time="0.016096" file="src/app/modules/coupon/services/coupon/coupon-service-2.test.ts" assertions="1" />
+    <testcase name="rejects expired coupon" classname="Date validity &amp;gt; Validating coupon" time="0" file="src/app/modules/coupon/services/coupon/coupon-service-2.test.ts" assertions="0">
+      <skipped />
+    </testcase>
+  </testsuite>
+</testsuites>
+			]]
+			local result = require("neotest-bun.parse-result").xmlToNeotestResults(xml)
+			assert.Equal(
+				inspect({
+					["src/app/modules/coupon/services/coupon/coupon-service-2.test.ts::Validating coupon::Date validity::accepts coupon within valid date range"] = {
+						status = "passed",
+					},
+					["src/app/modules/coupon/services/coupon/coupon-service-2.test.ts::Validating coupon::Date validity::rejects expired coupon"] = {
+						status = "skipped",
+					},
+				}),
+				inspect(result)
+			)
+		end)
+
+		async.it("handles nested testsuites without testcases", function()
+			local xml = [[
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="bun test" tests="10" assertions="4" failures="0" skipped="9" time="1.571951">
+  <testsuite name="src/app/modules/payment/services/payment/payment-jobs.test.ts" file="src/app/modules/payment/services/payment/payment-jobs.test.ts" tests="10" assertions="4" failures="0" skipped="9" time="0" hostname="Bences-MacBook-Pro.local">
+    <testsuite name="payment jobs" file="src/app/modules/payment/services/payment/payment-jobs.test.ts" line="130" tests="10" assertions="4" failures="0" skipped="9" time="0.239" hostname="Bences-MacBook-Pro.local">
+      <testcase name="processes multiple payment jobs concurrently" classname="payment jobs" time="0" file="src/app/modules/payment/services/payment/payment-jobs.test.ts" line="131" assertions="0">
+        <skipped />
+      </testcase>
+      <testcase name="handles reservation balance payment" classname="payment jobs" time="0.239536" file="src/app/modules/payment/services/payment/payment-jobs.test.ts" line="350" assertions="4" />
+    </testsuite>
+  </testsuite>
+</testsuites>
+			]]
+			local result = require("neotest-bun.parse-result").xmlToNeotestResults(xml)
+			assert.Equal(
+				inspect({
+					["payment jobs::payment jobs::processes multiple payment jobs concurrently"] = {
+						status = "skipped",
+					},
+					["payment jobs::payment jobs::handles reservation balance payment"] = {
+						status = "passed",
+					},
+				}),
+				inspect(result)
+			)
+		end)
 	end)
 end)

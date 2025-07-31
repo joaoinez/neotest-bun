@@ -62,6 +62,53 @@ function ReverseAndJoin(str)
 	return table.concat(reversed, "::")
 end
 
+local function processSuite(suite, results)
+	local file_path = suite._attr.name
+	
+	-- If this suite has testcases, process them
+	if suite.testcase then
+		local testcases = #suite.testcase == 0 and { suite.testcase } or suite.testcase
+		
+		for _, testcase in ipairs(testcases) do
+			local test_name = testcase._attr.name
+			local classname = testcase._attr.classname
+
+			-- Check for failures or errors within the test case
+			local status = "passed"
+			local errors = {}
+
+			if testcase.failure or testcase.error then
+				status = "failed"
+				table.insert(errors, {
+					message = testcase.failure._attr.type or "",
+				})
+			end
+			if testcase.skipped then
+				status = "skipped"
+			end
+
+			-- Create neotest result structure
+			local result = {
+				status = status,
+				-- short = string.format("%s::%s (%s)", classname, test_name, status),
+				errors = #errors > 0 and errors or nil,
+			}
+
+			-- Generate a unique ID for this test
+			local id = file_path .. "::" .. ReverseAndJoin(classname) .. "::" .. test_name
+			results[id] = result
+		end
+	end
+	
+	-- If this suite has nested testsuites, process them recursively
+	if suite.testsuite then
+		local nested_suites = #suite.testsuite == 0 and { suite.testsuite } or suite.testsuite
+		for _, nested_suite in ipairs(nested_suites) do
+			processSuite(nested_suite, results)
+		end
+	end
+end
+
 local function xmlToNeotestResults(xml_string)
 	local xml2lua = require("xml2lua")
 	local handler = require("xmlhandler.tree"):new()
@@ -79,39 +126,7 @@ local function xmlToNeotestResults(xml_string)
 	for _, testsuite in ipairs(testsuites) do
 		local suites = #testsuite.testsuite == 0 and { testsuite.testsuite } or testsuite.testsuite
 		for _, suite in ipairs(suites) do
-			local file_path = suite._attr.name
-			local testcases = #suite.testcase == 0 and { suite.testcase } or suite.testcase
-
-			-- Process test cases
-			for _, testcase in ipairs(testcases) do
-				local test_name = testcase._attr.name
-				local classname = testcase._attr.classname
-
-				-- Check for failures or errors within the test case
-				local status = "passed"
-				local errors = {}
-
-				if testcase.failure or testcase.error then
-					status = "failed"
-					table.insert(errors, {
-						message = testcase.failure._attr.type or "",
-					})
-				end
-				if testcase.skipped then
-					status = "skipped"
-				end
-
-				-- Create neotest result structure
-				local result = {
-					status = status,
-					-- short = string.format("%s::%s (%s)", classname, test_name, status),
-					errors = #errors > 0 and errors or nil,
-				}
-
-				-- Generate a unique ID for this test
-				local id = file_path .. "::" .. ReverseAndJoin(classname) .. "::" .. test_name
-				results[id] = result
-			end
+			processSuite(suite, results)
 		end
 	end
 
