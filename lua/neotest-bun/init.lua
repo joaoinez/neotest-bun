@@ -205,7 +205,7 @@ Adapter = {
 
 		-- Debug: Write XML content and parsed results to files for debugging
 		local debug_file_xml = io.open("./neotest-bun-debug-xml.txt", "w")
-		if debug_file_xml then
+		if debug_file_xml and false then
 			debug_file_xml:write("=== SPEC ===\n")
 			debug_file_xml:write(inspect(spec))
 			debug_file_xml:write("\n\n=== _RESULT ===\n")
