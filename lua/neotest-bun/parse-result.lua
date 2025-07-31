@@ -68,8 +68,9 @@ function ReverseAndJoin(str)
 	return table.concat(reversed, "::")
 end
 
-local function processSuite(suite, results)
-	local file_path = suite._attr.name
+local function processSuite(suite, results, file_path)
+	-- Use provided file_path or fall back to suite name
+	local current_file_path = file_path or suite._attr.name
 	
 	-- If this suite has testcases, process them
 	if suite.testcase then
@@ -101,7 +102,7 @@ local function processSuite(suite, results)
 			}
 
 			-- Generate a unique ID for this test
-			local id = file_path .. "::" .. ReverseAndJoin(classname) .. "::" .. test_name
+			local id = current_file_path .. "::" .. ReverseAndJoin(classname) .. "::" .. test_name
 			results[id] = result
 		end
 	end
@@ -110,7 +111,7 @@ local function processSuite(suite, results)
 	if suite.testsuite then
 		local nested_suites = #suite.testsuite == 0 and { suite.testsuite } or suite.testsuite
 		for _, nested_suite in ipairs(nested_suites) do
-			processSuite(nested_suite, results)
+			processSuite(nested_suite, results, current_file_path)
 		end
 	end
 end
@@ -132,7 +133,8 @@ local function xmlToNeotestResults(xml_string)
 	for _, testsuite in ipairs(testsuites) do
 		local suites = #testsuite.testsuite == 0 and { testsuite.testsuite } or testsuite.testsuite
 		for _, suite in ipairs(suites) do
-			processSuite(suite, results)
+			-- Pass the top-level suite name as the file path for nested processing
+			processSuite(suite, results, suite._attr.name)
 		end
 	end
 

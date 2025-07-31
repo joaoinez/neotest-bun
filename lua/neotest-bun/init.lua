@@ -189,7 +189,16 @@ Adapter = {
 		local formatted_results = {}
 
 		for key, result in pairs(results) do
-			formatted_results[vim.fn.getcwd() .. "/" .. key] = result
+			-- Check if key already contains a full path, if not prepend cwd
+			local formatted_key
+			if string.match(key, "^/") then
+				-- Key already has absolute path
+				formatted_key = key
+			else
+				-- Key needs full path - prepend cwd
+				formatted_key = vim.fn.getcwd() .. "/" .. key
+			end
+			formatted_results[formatted_key] = result
 		end
 
 		local inspect = require("inspect")

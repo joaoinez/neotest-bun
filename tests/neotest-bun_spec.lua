@@ -214,10 +214,10 @@ describe("neotest-bun", function()
 			local result = require("neotest-bun.parse-result").xmlToNeotestResults(xml)
 			assert.Equal(
 				inspect({
-					["payment jobs::payment jobs::processes multiple payment jobs concurrently"] = {
+					["src/app/modules/payment/services/payment/payment-jobs.test.ts::payment jobs::processes multiple payment jobs concurrently"] = {
 						status = "skipped",
 					},
-					["payment jobs::payment jobs::handles reservation balance payment"] = {
+					["src/app/modules/payment/services/payment/payment-jobs.test.ts::payment jobs::handles reservation balance payment"] = {
 						status = "passed",
 					},
 				}),
@@ -241,13 +241,13 @@ describe("neotest-bun", function()
 			local result = require("neotest-bun.parse-result").xmlToNeotestResults(xml)
 			assert.Equal(
 				inspect({
-					["sync::sync::logged out payment"] = {
+					["src/app/modules/payment/services/payment/cash-sync-2.test.ts::sync::logged out payment"] = {
 						status = "passed",
 					},
-					["sync::sync::logged in payment"] = {
+					["src/app/modules/payment/services/payment/cash-sync-2.test.ts::sync::logged in payment"] = {
 						status = "passed",
 					},
-					["sync::sync::topup"] = {
+					["src/app/modules/payment/services/payment/cash-sync-2.test.ts::sync::topup"] = {
 						status = "passed",
 					},
 				}),
