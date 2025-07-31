@@ -102,7 +102,12 @@ local function processSuite(suite, results, file_path)
 			}
 
 			-- Generate a unique ID for this test
-			local id = current_file_path .. "::" .. ReverseAndJoin(classname) .. "::" .. test_name
+			local id
+			if classname and classname ~= "" then
+				id = current_file_path .. "::" .. ReverseAndJoin(classname) .. "::" .. test_name
+			else
+				id = current_file_path .. "::" .. test_name
+			end
 			results[id] = result
 		end
 	end

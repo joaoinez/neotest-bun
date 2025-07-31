@@ -254,5 +254,37 @@ describe("neotest-bun", function()
 				inspect(result)
 			)
 		end)
+
+		async.it("handles empty classname", function()
+			local xml = [[
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="bun test" tests="3" assertions="9" failures="0" skipped="2" time="2.887823">
+  <testsuite name="src/app/modules/payment/services/payment/cash-sync-2.test.ts" file="src/app/modules/payment/services/payment/cash-sync-2.test.ts" tests="3" assertions="9" failures="0" skipped="2" time="0.572" hostname="Bences-MacBook-Pro.local">
+    <testcase name="logged out payment" classname="" time="0.572274" file="src/app/modules/payment/services/payment/cash-sync-2.test.ts" line="11" assertions="9" />
+    <testcase name="logged in payment" classname="" time="0" file="src/app/modules/payment/services/payment/cash-sync-2.test.ts" line="80" assertions="0">
+      <skipped />
+    </testcase>
+    <testcase name="topup" classname="" time="0" file="src/app/modules/payment/services/payment/cash-sync-2.test.ts" line="138" assertions="0">
+      <skipped />
+    </testcase>
+  </testsuite>
+</testsuites>
+			]]
+			local result = require("neotest-bun.parse-result").xmlToNeotestResults(xml)
+			assert.Equal(
+				inspect({
+					["src/app/modules/payment/services/payment/cash-sync-2.test.ts::logged out payment"] = {
+						status = "passed",
+					},
+					["src/app/modules/payment/services/payment/cash-sync-2.test.ts::logged in payment"] = {
+						status = "skipped",
+					},
+					["src/app/modules/payment/services/payment/cash-sync-2.test.ts::topup"] = {
+						status = "skipped",
+					},
+				}),
+				inspect(result)
+			)
+		end)
 	end)
 end)
