@@ -57,7 +57,7 @@ function ReverseAndJoin(str)
 	else
 		parts = str:split(" > ")
 	end
-	
+
 	-- Reverse the array
 	local reversed = {}
 	for i = #parts, 1, -1 do
@@ -71,11 +71,11 @@ end
 local function processSuite(suite, results, file_path)
 	-- Use provided file_path or fall back to suite name
 	local current_file_path = file_path or suite._attr.name
-	
+
 	-- If this suite has testcases, process them
 	if suite.testcase then
 		local testcases = #suite.testcase == 0 and { suite.testcase } or suite.testcase
-		
+
 		for _, testcase in ipairs(testcases) do
 			local test_name = testcase._attr.name
 			local classname = testcase._attr.classname
@@ -111,7 +111,7 @@ local function processSuite(suite, results, file_path)
 			results[id] = result
 		end
 	end
-	
+
 	-- If this suite has nested testsuites, process them recursively
 	if suite.testsuite then
 		local nested_suites = #suite.testsuite == 0 and { suite.testsuite } or suite.testsuite
@@ -122,14 +122,10 @@ local function processSuite(suite, results, file_path)
 end
 
 local function xmlToNeotestResults(xml_string)
-	local xml2lua = require("xml2lua")
-	local handler = require("xmlhandler.tree"):new()
-	local parser = xml2lua.parser(handler)
-	local inspect = require("inspect")
-	parser:parse(xml_string)
-
+	local parser = require("neotest.lib.xml")
 	---@type RootObject
-	local root = handler.root
+	local root = parser.parse(xml_string)
+
 	local results = {}
 
 	local testsuites = #root.testsuites == 0 and { root.testsuites } or root.testsuites
