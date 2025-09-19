@@ -201,7 +201,7 @@ Adapter = {
 			formatted_results[formatted_key] = result
 		end
 
-		local inspect = require("inspect")
+		--[[ local inspect = require("inspect")
 
 		-- Debug: Write XML content and parsed results to files for debugging
 		local debug_file_xml = io.open("./neotest-bun-debug-xml.txt", "w")
@@ -219,7 +219,7 @@ Adapter = {
 			debug_file_xml:write("\n\n=== FORMATTED RESULTS ===\n")
 			debug_file_xml:write(inspect(formatted_results))
 			debug_file_xml:close()
-		end
+		end ]]
 
 		return formatted_results
 	end,
